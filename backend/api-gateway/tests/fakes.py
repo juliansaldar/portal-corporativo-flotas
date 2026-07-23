@@ -16,6 +16,9 @@ class FakeVehicleStateReader:
             raise ConnectionError("simulated ingestion-service outage")
         return self._states
 
+    async def aclose(self) -> None:
+        pass
+
 
 class ScriptedChatModel:
     """Fake de ChatModelPort que reproduce una secuencia fija de turnos."""

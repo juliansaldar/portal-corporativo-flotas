@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -22,6 +23,7 @@ class AppState:
 
 
 state = AppState()
+logger = logging.getLogger("api-gateway")
 
 
 @asynccontextmanager
@@ -70,6 +72,13 @@ async def _chat_event_stream(message: str):
         yield _sse_event(
             "No puedo consultar el estado de la flota o al asistente de IA en este momento "
             "(circuit breaker abierto). Intenta de nuevo en unos segundos."
+        )
+        yield "event: done\ndata: {}\n\n"
+        return
+    except Exception:  # noqa: BLE001 - cualquier falla del modelo o de ingestion-service degrada a un mensaje, no un stream roto
+        logger.exception("agent chat failed")
+        yield _sse_event(
+            "Ocurrio un error consultando al asistente de IA. Intenta de nuevo en unos momentos."
         )
         yield "event: done\ndata: {}\n\n"
         return
