@@ -49,6 +49,12 @@ services:
         condition: service_healthy
       timescaledb:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   api-gateway:
     build:
@@ -62,7 +68,14 @@ services:
     ports:
       - "8002:8000"
     depends_on:
-      - ingestion-service
+      ingestion-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   frontend:
     build:
@@ -72,7 +85,8 @@ services:
     ports:
       - "5173:5173"
     depends_on:
-      - api-gateway
+      api-gateway:
+        condition: service_healthy
 
 volumes:
   timescale_data:
