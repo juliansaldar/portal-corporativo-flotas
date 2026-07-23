@@ -24,6 +24,6 @@
 
 ## 5. Verificación funcional del bloque
 
-- [ ] 5.1 `docker compose up` levanta `api-gateway` junto al resto del stack sin errores
-- [ ] 5.2 Con datos de telemetría de prueba (vehículo detenido en una `CriticalZone` sembrada), preguntar "¿qué vehículos llevan detenidos más de 20 minutos en zonas críticas?" vía `POST /v1/agent/chat` y confirmar que la respuesta lista el vehículo correcto
-- [ ] 5.3 Apagar `ingestion-service` y confirmar que el chat responde con el mensaje de fallback (breaker abierto) en vez de colgarse
+- [x] 5.1 `docker compose up` levanta `api-gateway` junto al resto del stack sin errores
+- [ ] 5.2 **Bloqueado**: la cuenta de Anthropic usada para pruebas no tiene créditos (`credit balance too low`). El endpoint sí llega correctamente a la API (autenticación ok) y el resto del loop de tool-use está cubierto por tests unitarios (3.4). Pendiente de reintentar con una cuenta con saldo antes de dar la prueba por cerrada del todo.
+- [x] 5.3 Apagar `ingestion-service` y confirmar fallback: verificado en vivo contra `GET /v1/vehicles/state` (mismo cliente/breaker que usa el agente) — breaker abre tras 5 fallos y responde `503` con mensaje claro; al reiniciar `ingestion-service` el breaker vuelve a cerrar solo. Encontrado y corregido en el camino: el endpoint no capturaba `CircuitBreakerOpenError` y devolvía `500` genérico en vez de `503` — ver commit de fix y Auditoría de IA en README.
