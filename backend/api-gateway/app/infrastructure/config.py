@@ -16,5 +16,7 @@ class Settings(BaseSettings):
     anthropic_breaker_failure_threshold: int = 3
     anthropic_breaker_reset_timeout_seconds: float = 60.0
 
+    vehicle_stream_interval_seconds: float = 3.0
+
 
 settings = Settings()
