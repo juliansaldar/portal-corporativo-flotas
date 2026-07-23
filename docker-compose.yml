@@ -1,0 +1,54 @@
+services:
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.7
+    command:
+      - redpanda
+      - start
+      - --smp=1
+      - --memory=512M
+      - --overprovisioned
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:19092
+      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092,OUTSIDE://localhost:19092
+    ports:
+      - "19092:19092"
+    healthcheck:
+      test: ["CMD", "rpk", "cluster", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  timescaledb:
+    image: timescale/timescaledb:2.17.2-pg16
+    environment:
+      POSTGRES_DB: fleet
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ingestion-service:
+    build:
+      context: .
+      dockerfile: backend/ingestion-service/Dockerfile
+    environment:
+      REDPANDA_BROKERS: redpanda:9092
+      DATABASE_URL: postgresql://postgres:postgres@timescaledb:5432/fleet
+    ports:
+      - "8001:8000"
+    depends_on:
+      redpanda:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+
+volumes:
+  timescale_data:
