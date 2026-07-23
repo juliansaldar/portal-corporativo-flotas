@@ -18,5 +18,11 @@ class Settings(BaseSettings):
 
     vehicle_stream_interval_seconds: float = 3.0
 
+    cors_allowed_origins: str = "http://localhost:5173"
+
+    @property
+    def cors_allowed_origins_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_allowed_origins.split(",") if origin.strip()]
+
 
 settings = Settings()
