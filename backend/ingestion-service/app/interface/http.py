@@ -10,6 +10,7 @@ from shared.resilience import CircuitBreaker, CircuitBreakerOpenError
 
 from app.application.get_vehicle_states import get_vehicle_states
 from app.application.ingest_telemetry import ingest_telemetry
+from app.application.ingest_telemetry_bulk import ingest_telemetry_bulk
 from app.application.process_telemetry_event import process_telemetry_event
 from app.infrastructure.config import settings
 from app.infrastructure.event_bus import KafkaEventConsumer, KafkaEventPublisher
@@ -72,6 +73,15 @@ async def post_telemetry(event: TelemetryEvent) -> dict:
     except CircuitBreakerOpenError as exc:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
     return {"accepted": True, "event_id": event.event_id}
+
+
+@app.post("/v1/telemetry/bulk", status_code=status.HTTP_202_ACCEPTED)
+async def post_telemetry_bulk(events: list[TelemetryEvent]) -> dict:
+    try:
+        count = await _publish_breaker.call(ingest_telemetry_bulk, events, state.publisher)
+    except CircuitBreakerOpenError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    return {"accepted": True, "count": count}
 
 
 @app.get("/internal/vehicles/state", response_model=list[VehicleState])
