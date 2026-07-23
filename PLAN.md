@@ -63,7 +63,7 @@ Para cada change, el ciclo es: `openspec new change <nombre>` → escribir/gener
 ## Git y GitHub
 - `git init` local; `git config user.email/user.name` **solo en este repo** (no global) con los datos de `juliansaldar@gmail.com`.
 - El usuario crea el repo **público** en GitHub (requisito explícito del PDF, sección 2 "Transparencia y Propiedad Intelectual") bajo esa cuenta. URL del remoto ya confirmada: `git@github.com:juliansaldar/portal-corporativo-flotas.git` → configuro `origin` con esa URL (SSH) y confirmo contigo antes del primer `git push` (acción pública).
-- Rama por change (`change/telemetry-ingestion`, etc.) + PR a `main` por bloque, o commits directos a `main` si el tiempo aprieta — a decidir contigo al llegar ahí.
+- **Rama por change** (`change/telemetry-ingestion`, `change/fleet-ai-agent`, etc.), mergeada a `main` con `--no-ff` (merge commit explícito) cuando el change está completo y verificado. La rama del change en curso queda activa hasta cerrarlo; no se commitea directo a `main`.
 - Commits en **Conventional Commits**, uno por artefacto OpenSpec y uno por tarea/grupo de tareas completado, ej.:
   - `docs(openspec): add proposal for telemetry-ingestion`
   - `docs(openspec): add specs/design/tasks for telemetry-ingestion`
