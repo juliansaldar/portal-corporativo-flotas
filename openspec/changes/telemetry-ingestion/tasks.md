@@ -35,7 +35,7 @@
 
 ## 7. Verificación funcional del bloque
 
-- [ ] 7.1 `docker compose up` levanta redpanda + timescaledb + ingestion-service sin errores
-- [ ] 7.2 `curl -X POST /v1/telemetry` con payload de ejemplo → verificar fila en TimescaleDB
-- [ ] 7.3 Enviar 2 eventos con mismo `event_id` → verificar una sola fila
-- [ ] 7.4 Enviar posición dentro de una `CriticalZone` con velocidad 0 repetida → verificar `stopped_duration` creciente vía `GET /internal/vehicles/state`
+- [x] 7.1 `docker compose up` levanta redpanda + timescaledb + ingestion-service sin errores
+- [x] 7.2 `curl -X POST /v1/telemetry` con payload de ejemplo → verificar fila en TimescaleDB
+- [x] 7.3 Enviar 2 eventos con mismo `event_id` → verificar una sola fila
+- [x] 7.4 Enviar posición dentro de una `CriticalZone` con velocidad 0 repetida → verificar `stopped_duration` creciente vía `GET /internal/vehicles/state` (verificado: 1412s dentro de `zona-franca-norte`, > 20 min del ejemplo del PDF)
