@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from shared.models import VehicleState
@@ -46,6 +48,13 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="api-gateway", lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_allowed_origins_list,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/healthz")
 async def healthz() -> dict:
@@ -61,6 +70,36 @@ async def get_vehicles_state() -> list[VehicleState]:
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="ingestion-service no responde en este momento (circuit breaker abierto)",
         ) from exc
+
+
+async def _vehicle_stream_tick() -> str:
+    """Un unico evento SSE con el estado de la flota, o un evento de error legible."""
+    try:
+        states = await query_vehicle_state(state.ingestion_client)
+        payload = [s.model_dump(mode="json") for s in states]
+        return f"data: {json.dumps(payload)}\n\n"
+    except CircuitBreakerOpenError:
+        return (
+            "event: stream-error\n"
+            f"data: {json.dumps({'message': 'ingestion-service no responde (circuit breaker abierto)'})}\n\n"
+        )
+    except Exception:  # noqa: BLE001 - un tick fallido no debe cerrar la conexion SSE
+        logger.exception("vehicle stream tick failed")
+        return (
+            "event: stream-error\n"
+            f"data: {json.dumps({'message': 'error obteniendo el estado de la flota'})}\n\n"
+        )
+
+
+async def _vehicle_event_stream():
+    while True:
+        yield await _vehicle_stream_tick()
+        await asyncio.sleep(settings.vehicle_stream_interval_seconds)
+
+
+@app.get("/v1/vehicles/stream")
+async def get_vehicles_stream() -> StreamingResponse:
+    return StreamingResponse(_vehicle_event_stream(), media_type="text/event-stream")
 
 
 class ChatRequest(BaseModel):

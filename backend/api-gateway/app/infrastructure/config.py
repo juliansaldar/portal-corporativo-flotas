@@ -16,5 +16,13 @@ class Settings(BaseSettings):
     anthropic_breaker_failure_threshold: int = 3
     anthropic_breaker_reset_timeout_seconds: float = 60.0
 
+    vehicle_stream_interval_seconds: float = 3.0
+
+    cors_allowed_origins: str = "http://localhost:5173"
+
+    @property
+    def cors_allowed_origins_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_allowed_origins.split(",") if origin.strip()]
+
 
 settings = Settings()
