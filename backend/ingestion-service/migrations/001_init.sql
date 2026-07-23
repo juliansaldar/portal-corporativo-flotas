@@ -1,7 +1,10 @@
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 CREATE TABLE IF NOT EXISTS vehicle_telemetry (
-    event_id UUID NOT NULL,
+    -- event_id es TEXT, no UUID: el dominio (TelemetryEvent.event_id) solo exige
+    -- un string no vacio como idempotency key, no un formato UUID especifico.
+    -- Un dispositivo/mobile real podria enviar cualquier esquema de id.
+    event_id TEXT NOT NULL,
     vehicle_id TEXT NOT NULL,
     lat DOUBLE PRECISION NOT NULL,
     lon DOUBLE PRECISION NOT NULL,
@@ -23,7 +26,7 @@ SELECT add_compression_policy('vehicle_telemetry', INTERVAL '1 day', if_not_exis
 -- constraints unicas incluyan la columna de particion (ts), lo que no sirve
 -- para deduplicar por event_id solo. Ver design.md, decision 5.
 CREATE TABLE IF NOT EXISTS processed_events (
-    event_id UUID PRIMARY KEY,
+    event_id TEXT PRIMARY KEY,
     processed_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
