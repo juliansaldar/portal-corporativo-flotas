@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-07-23
+goal: SPA React+Vite con SSE, mapa MapLibre, chat con el agente, branding desde
+  ./info
