@@ -72,13 +72,13 @@ async def _vehicle_stream_tick() -> str:
         return f"data: {json.dumps(payload)}\n\n"
     except CircuitBreakerOpenError:
         return (
-            "event: error\n"
+            "event: stream-error\n"
             f"data: {json.dumps({'message': 'ingestion-service no responde (circuit breaker abierto)'})}\n\n"
         )
     except Exception:  # noqa: BLE001 - un tick fallido no debe cerrar la conexion SSE
         logger.exception("vehicle stream tick failed")
         return (
-            "event: error\n"
+            "event: stream-error\n"
             f"data: {json.dumps({'message': 'error obteniendo el estado de la flota'})}\n\n"
         )
 

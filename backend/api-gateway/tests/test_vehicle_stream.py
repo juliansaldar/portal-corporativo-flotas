@@ -41,5 +41,5 @@ async def test_tick_emits_error_event_without_raising_when_breaker_open():
 
     event = await _vehicle_stream_tick()
 
-    assert event.startswith("event: error")
+    assert event.startswith("event: stream-error")
     assert "circuit breaker" in event
