@@ -4,14 +4,21 @@ CREATE TABLE IF NOT EXISTS vehicle_telemetry (
     -- event_id es TEXT, no UUID: el dominio (TelemetryEvent.event_id) solo exige
     -- un string no vacio como idempotency key, no un formato UUID especifico.
     -- Un dispositivo/mobile real podria enviar cualquier esquema de id.
+    --
+    -- Sin PRIMARY KEY (vehicle_id, ts): esa constraint fue un error real (ver
+    -- Auditoria de IA en el README) - dos eventos DISTINTOS del mismo vehiculo
+    -- con el mismo timestamp se descartaban silenciosamente por el ON CONFLICT,
+    -- aunque tuvieran event_id distinto. La deduplicacion real ya la garantiza
+    -- processed_events por event_id, ANTES de llegar a este insert.
     event_id TEXT NOT NULL,
     vehicle_id TEXT NOT NULL,
     lat DOUBLE PRECISION NOT NULL,
     lon DOUBLE PRECISION NOT NULL,
     speed_kmh DOUBLE PRECISION NOT NULL,
-    ts TIMESTAMPTZ NOT NULL,
-    PRIMARY KEY (vehicle_id, ts)
+    ts TIMESTAMPTZ NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS idx_vehicle_telemetry_vehicle_ts ON vehicle_telemetry (vehicle_id, ts DESC);
 
 SELECT create_hypertable('vehicle_telemetry', 'ts', if_not_exists => TRUE);
 SELECT add_retention_policy('vehicle_telemetry', INTERVAL '7 days', if_not_exists => TRUE);
