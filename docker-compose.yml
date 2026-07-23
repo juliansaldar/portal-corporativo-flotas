@@ -50,5 +50,19 @@ services:
       timescaledb:
         condition: service_healthy
 
+  api-gateway:
+    build:
+      context: .
+      dockerfile: backend/api-gateway/Dockerfile
+    env_file:
+      - path: backend/api-gateway/.env
+        required: false
+    environment:
+      INGESTION_SERVICE_URL: http://ingestion-service:8000
+    ports:
+      - "8002:8000"
+    depends_on:
+      - ingestion-service
+
 volumes:
   timescale_data:
