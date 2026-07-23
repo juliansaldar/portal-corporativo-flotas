@@ -1,0 +1,34 @@
+schema: spec-driven
+
+context: |
+  Proyecto: Portal Corporativo de Monitoreo de Flotas (take-home assessment senior fullstack).
+  Ver AGENTS.md y PLAN.md en la raíz del repo para el detalle completo; resumen:
+
+  Stack fijo: Python 3.12 + FastAPI en dos microservicios (ingestion-service, api-gateway).
+  Redpanda (Kafka API-compatible) como bus de eventos. TimescaleDB (Postgres + extensión) como
+  única persistencia — no Cassandra/Druid (recorte justificado). Agente de IA con el SDK oficial
+  de Anthropic (tool-use directo, sin LangChain). Frontend React + Vite (sin Next.js). Mobile
+  Expo/React Native offline-first. Terraform solo como documentación, no se aplica en AWS real.
+
+  Arquitectura: Clean Architecture por servicio backend (domain/application/infrastructure/interface).
+  Circuit breaker en las llamadas api-gateway -> ingestion-service y api-gateway -> Anthropic.
+  El dominio de vehículos debe incluir CriticalZone (geofence) y stopped_since/stopped_duration
+  por vehículo — son necesarios para responder la pregunta ejemplo del PDF ("vehículos detenidos
+  +20 min en zonas críticas").
+
+  5 changes en este orden de dependencia: telemetry-ingestion -> fleet-ai-agent ->
+  web-portal-dashboard -> driver-mobile-app -> chaos-load-testing-iac.
+
+  Convenciones: Conventional Commits. Ningún secreto en el repo (solo .env server-side).
+  Cualquier sugerencia deficiente/insegura del IDE agéntico y su corrección debe registrarse
+  en la sección "Auditoría de IA" del README.
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
