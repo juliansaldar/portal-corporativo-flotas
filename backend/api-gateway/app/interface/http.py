@@ -4,7 +4,7 @@ import json
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from shared.models import VehicleState
@@ -54,7 +54,13 @@ async def healthz() -> dict:
 
 @app.get("/v1/vehicles/state", response_model=list[VehicleState])
 async def get_vehicles_state() -> list[VehicleState]:
-    return await query_vehicle_state(state.ingestion_client)
+    try:
+        return await query_vehicle_state(state.ingestion_client)
+    except CircuitBreakerOpenError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="ingestion-service no responde en este momento (circuit breaker abierto)",
+        ) from exc
 
 
 class ChatRequest(BaseModel):
