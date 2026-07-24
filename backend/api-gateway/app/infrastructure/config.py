@@ -8,7 +8,7 @@ class Settings(BaseSettings):
 
     ingestion_service_url: str = "http://localhost:8001"
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-flash-latest"
 
     ingestion_breaker_failure_threshold: int = 5
     ingestion_breaker_reset_timeout_seconds: float = 30.0

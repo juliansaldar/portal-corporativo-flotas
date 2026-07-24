@@ -54,7 +54,8 @@ def _to_gemini_contents(messages: list[dict]) -> list[types.Content]:
                                 id=block["id"],
                                 name=block["name"],
                                 args=block.get("input") or {},
-                            )
+                            ),
+                            thought_signature=block.get("thought_signature"),
                         )
                     )
                 elif block_type == "tool_result":
@@ -108,6 +109,12 @@ def _from_gemini_response(response: types.GenerateContentResponse) -> ModelTurn:
                     "id": part.function_call.id or f"call_{index}",
                     "name": part.function_call.name,
                     "input": part.function_call.args or {},
+                    # Gemini exige reenviar esta firma opaca junto con el
+                    # function_call en el siguiente turno (modelos "thinking");
+                    # sin ella la API responde 400 INVALID_ARGUMENT. Se propaga
+                    # como un campo mas del bloque normalizado sin que
+                    # agent_chat.py necesite saber que existe.
+                    "thought_signature": part.thought_signature,
                 }
             )
         elif part.text:

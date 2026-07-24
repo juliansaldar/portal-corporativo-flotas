@@ -114,6 +114,7 @@ def test_from_gemini_response_detects_tool_use_turn():
             "id": "call_1",
             "name": "query_vehicle_state",
             "input": {"min_stopped_seconds": 1200},
+            "thought_signature": None,
         }
     ]
 
