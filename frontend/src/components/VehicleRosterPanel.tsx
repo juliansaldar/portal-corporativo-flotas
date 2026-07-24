@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { getVehicleProfile } from '../data/dummyVehicleProfiles'
+import { getVehicleProfile, isMobileAppVehicle } from '../data/dummyVehicleProfiles'
 import type { VehicleState } from '../types'
 
 const MAX_VISIBLE_ROWS = 8
@@ -22,7 +22,12 @@ export function VehicleRosterPanel({
       [...vehicles].sort((a, b) => {
         const aAlert = alertVehicleIds.has(a.vehicle_id) ? 1 : 0
         const bAlert = alertVehicleIds.has(b.vehicle_id) ? 1 : 0
-        return bAlert - aAlert
+        if (aAlert !== bAlert) return bAlert - aAlert
+        // El vehiculo de la app movil siempre debe ser visible en la demo,
+        // sin importar cuantos vehiculos de prueba (k6) esten reportando.
+        const aKnown = isMobileAppVehicle(a.vehicle_id) ? 1 : 0
+        const bKnown = isMobileAppVehicle(b.vehicle_id) ? 1 : 0
+        return bKnown - aKnown
       }),
     [vehicles, alertVehicleIds],
   )

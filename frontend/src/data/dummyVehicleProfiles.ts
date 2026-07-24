@@ -22,7 +22,7 @@ export interface DummyVehicleProfile {
 // app movil muestra para si misma) — ver getVehicleProfile mas abajo.
 export const DUMMY_VEHICLE_PROFILES: DummyVehicleProfile[] = [
   {
-    plate: 'XYZ-123',
+    plate: 'ABC-123',
     model: 'Toyota Corolla',
     driverName: 'Julian Saldarriaga',
     driverInitials: 'JS',
@@ -88,10 +88,17 @@ export const DUMMY_VEHICLE_PROFILES: DummyVehicleProfile[] = [
 // texto libre que el usuario edita y persiste en SQLite, asi que cambia con
 // el tiempo — ver design.md de mobile-web-vehicle-id-config. Sin la variable
 // seteada, cae al DEFAULT_VEHICLE_ID de mobile/App.tsx ('veh-mobile-1').
-const MOBILE_APP_VEHICLE_ID = import.meta.env.VITE_MOBILE_VEHICLE_ID ?? 'veh-mobile-1'
+const MOBILE_APP_VEHICLE_ID = (import.meta.env.VITE_MOBILE_VEHICLE_ID ?? 'veh-mobile-1').toLowerCase()
+
+// El vehicle_id que envia el telefono (campo de texto libre en la app movil)
+// puede diferir en mayusculas/minusculas de la variable de entorno — la
+// comparacion no debe ser sensible a case.
+export function isMobileAppVehicle(vehicleId: string): boolean {
+  return vehicleId.toLowerCase() === MOBILE_APP_VEHICLE_ID
+}
 
 export function getVehicleProfile(vehicleId: string): DummyVehicleProfile {
-  if (vehicleId === MOBILE_APP_VEHICLE_ID) {
+  if (isMobileAppVehicle(vehicleId)) {
     return DUMMY_VEHICLE_PROFILES[0]
   }
   const hash = Array.from(vehicleId).reduce((sum, char) => sum + char.charCodeAt(0), 0)

@@ -33,6 +33,27 @@ function MapFocusController({ focusedEvent }: { focusedEvent: TelemetryEvent | n
   return null
 }
 
+// Ajusta el encuadre para incluir todos los vehiculos cuando aparece uno con
+// un vehicle_id nunca antes visto (ej. al cargar el portal, o cuando la app
+// movil empieza a reportar) — sin esto, un vehiculo fuera del centro fijo en
+// Bogota (ej. Medellin) queda invisible aunque el marcador exista.
+function MapBoundsController({ vehicles }: { vehicles: VehicleState[] }) {
+  const map = useMap()
+  const knownIds = useRef<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (vehicles.length === 0) return
+    const hasNewVehicle = vehicles.some((v) => !knownIds.current.has(v.vehicle_id))
+    knownIds.current = new Set(vehicles.map((v) => v.vehicle_id))
+    if (!hasNewVehicle) return
+
+    const bounds = L.latLngBounds(vehicles.map((v): [number, number] => [v.lat, v.lon]))
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 })
+  }, [vehicles, map])
+
+  return null
+}
+
 function FocusedEventMarker({ event }: { event: TelemetryEvent }) {
   const markerRef = useRef<L.CircleMarker>(null)
 
@@ -66,6 +87,7 @@ export function MapView({ vehicles, alertVehicleIds, focusedEvent }: MapViewProp
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapFocusController focusedEvent={focusedEvent} />
+      <MapBoundsController vehicles={vehicles} />
       {vehicles.map((vehicle) => (
         <Marker key={vehicle.vehicle_id} position={[vehicle.lat, vehicle.lon]}>
           <Popup>

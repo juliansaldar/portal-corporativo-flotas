@@ -24,7 +24,7 @@ export interface DummyVehicleProfile {
 }
 
 export const DUMMY_VEHICLE_PROFILE: DummyVehicleProfile = {
-  plate: 'XYZ-123',
+  plate: 'ABC-123',
   model: 'Toyota Corolla',
   driverName: 'Julian Saldarriaga',
   driverInitials: 'JS',
