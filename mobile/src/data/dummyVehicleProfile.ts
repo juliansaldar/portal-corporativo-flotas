@@ -3,10 +3,11 @@
  * Ver design.md de driver-experience-visual-refresh, decision 1.
  *
  * Este es el perfil de referencia: frontend/src/data/dummyVehicleProfiles.ts
- * lo replica para que el vehicle_id por defecto de esta app (DEFAULT_VEHICLE_ID
- * en App.tsx, 'veh-mobile-1') se vea igual en el roster del portal web. Si
- * cambias algo aqui, actualiza tambien ese archivo (ver mobile-web-dummy-
- * profile-match).
+ * lo replica para que el vehicle_id real de esta app (el que se edite en el
+ * campo de texto de App.tsx) se vea igual en el roster del portal web. Si
+ * cambias este perfil o el vehicle_id de la app, actualiza tambien
+ * dummyVehicleProfiles.ts y la variable de entorno VITE_MOBILE_VEHICLE_ID
+ * en docker-compose.yml (ver mobile-web-vehicle-id-config).
  */
 export interface DummyDocument {
   name: string
@@ -23,7 +24,7 @@ export interface DummyVehicleProfile {
 }
 
 export const DUMMY_VEHICLE_PROFILE: DummyVehicleProfile = {
-  plate: 'VIH-100',
+  plate: 'XYZ-123',
   model: 'Toyota Corolla',
   driverName: 'Julian Saldarriaga',
   driverInitials: 'JS',

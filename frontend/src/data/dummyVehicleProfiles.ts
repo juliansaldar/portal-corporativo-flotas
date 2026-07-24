@@ -22,7 +22,7 @@ export interface DummyVehicleProfile {
 // app movil muestra para si misma) — ver getVehicleProfile mas abajo.
 export const DUMMY_VEHICLE_PROFILES: DummyVehicleProfile[] = [
   {
-    plate: 'VIH-100',
+    plate: 'XYZ-123',
     model: 'Toyota Corolla',
     driverName: 'Julian Saldarriaga',
     driverInitials: 'JS',
@@ -83,12 +83,15 @@ export const DUMMY_VEHICLE_PROFILES: DummyVehicleProfile[] = [
   },
 ]
 
-// Debe coincidir con DEFAULT_VEHICLE_ID en mobile/App.tsx: es el vehicle_id
-// real que reporta la app movil del usuario, no un id de ejemplo generico.
-export const MOBILE_APP_DEFAULT_VEHICLE_ID = 'veh-mobile-1'
+// Configurable por entorno (VITE_MOBILE_VEHICLE_ID en docker-compose.yml/.env)
+// en vez de hardcodeado: el vehicle_id real de la app movil es un campo de
+// texto libre que el usuario edita y persiste en SQLite, asi que cambia con
+// el tiempo — ver design.md de mobile-web-vehicle-id-config. Sin la variable
+// seteada, cae al DEFAULT_VEHICLE_ID de mobile/App.tsx ('veh-mobile-1').
+const MOBILE_APP_VEHICLE_ID = import.meta.env.VITE_MOBILE_VEHICLE_ID ?? 'veh-mobile-1'
 
 export function getVehicleProfile(vehicleId: string): DummyVehicleProfile {
-  if (vehicleId === MOBILE_APP_DEFAULT_VEHICLE_ID) {
+  if (vehicleId === MOBILE_APP_VEHICLE_ID) {
     return DUMMY_VEHICLE_PROFILES[0]
   }
   const hash = Array.from(vehicleId).reduce((sum, char) => sum + char.charCodeAt(0), 0)

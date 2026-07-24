@@ -85,6 +85,9 @@ services:
       context: ./frontend
     environment:
       VITE_API_GATEWAY_URL: http://localhost:8002
+      # vehicle_id que usa la app movil ahora mismo (campo de texto en
+      # mobile/App.tsx) — actualizar aqui cuando cambie, ver README.
+      VITE_MOBILE_VEHICLE_ID: xyz-123
     ports:
       - "5173:5173"
     depends_on:

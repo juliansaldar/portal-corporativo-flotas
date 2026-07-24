@@ -30,6 +30,8 @@ Cada bloque del enunciado (A-E) corresponde a un change de OpenSpec archivado: `
 
 El rediseño visual (change `driver-experience-visual-refresh`) sigue el mockup `info/simon_app_mockup_preview.html`. El roster de vehículos del portal y la "Guantera Digital" (portal y app móvil) muestran **placa, modelo, conductor y documentos (SOAT/tecnomecánica) de ejemplo** — datos de presentación fijos en `frontend/src/data/dummyVehicleProfiles.ts` y `mobile/src/data/dummyVehicleProfile.ts`, no telemetría real ni un backend de documentos. La posición, velocidad, zona y tiempo detenido que sí se muestran junto a ellos **sí son reales**, calculados por `ingestion-service` a partir de la telemetría. En la app móvil, las pestañas Guantera y SOS son vistas placeholder explícitas que no realizan ninguna llamada de red.
 
+**El `vehicle_id` que la app móvil usa de verdad SHALL coincidir con el que resalta en el roster del portal** (mismo nombre de conductor/placa) — es configurable, no hardcodeado: la variable de entorno `VITE_MOBILE_VEHICLE_ID` (`docker-compose.yml`, servicio `frontend`) determina qué `vehicle_id` resuelve al perfil de ejemplo en vez de al hash genérico. **Si cambias el `vehicle_id` en el campo de texto de la pantalla de Inicio de la app móvil, actualiza `VITE_MOBILE_VEHICLE_ID` al mismo valor y reconstruye el frontend** (`docker compose up -d --build frontend`) para que el portal siga mostrando el mismo vehículo.
+
 ## Cómo ejecutar
 
 Requisitos: Docker + Docker Compose.
