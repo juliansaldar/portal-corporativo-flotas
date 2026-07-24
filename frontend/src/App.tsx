@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import './App.css'
-import logo from './assets/logo.png'
+import logo from './assets/logo.svg'
 import { AlertsPanel } from './components/AlertsPanel'
 import { ChatPanel } from './components/ChatPanel'
 import { FleetSummaryCard } from './components/FleetSummaryCard'
