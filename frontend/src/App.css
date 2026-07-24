@@ -143,6 +143,12 @@
   padding: 0.6rem;
   background: var(--surface);
   border-radius: var(--radius);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.roster-row--selected {
+  border-color: var(--primary);
 }
 
 .roster-row .avatar {
@@ -326,6 +332,37 @@
 
 .chat-form input {
   flex: 1;
+}
+
+/* Live event feed panel */
+.feed-panel {
+  margin: 0 1rem 1rem 1rem;
+  max-height: 220px;
+}
+
+.feed-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.feed-row {
+  display: flex;
+  gap: 1rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  font-size: 0.78rem;
+}
+
+.feed-time {
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 1200px) {

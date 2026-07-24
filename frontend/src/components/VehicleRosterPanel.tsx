@@ -7,9 +7,16 @@ const MAX_VISIBLE_ROWS = 8
 interface VehicleRosterPanelProps {
   vehicles: VehicleState[]
   alertVehicleIds: Set<string>
+  selectedVehicleId: string | null
+  onSelect: (vehicleId: string) => void
 }
 
-export function VehicleRosterPanel({ vehicles, alertVehicleIds }: VehicleRosterPanelProps) {
+export function VehicleRosterPanel({
+  vehicles,
+  alertVehicleIds,
+  selectedVehicleId,
+  onSelect,
+}: VehicleRosterPanelProps) {
   const sorted = useMemo(
     () =>
       [...vehicles].sort((a, b) => {
@@ -33,8 +40,13 @@ export function VehicleRosterPanel({ vehicles, alertVehicleIds }: VehicleRosterP
           {visible.map((vehicle) => {
             const profile = getVehicleProfile(vehicle.vehicle_id)
             const isAlert = alertVehicleIds.has(vehicle.vehicle_id)
+            const isSelected = vehicle.vehicle_id === selectedVehicleId
             return (
-              <li key={vehicle.vehicle_id} className="roster-row">
+              <li
+                key={vehicle.vehicle_id}
+                className={`roster-row${isSelected ? ' roster-row--selected' : ''}`}
+                onClick={() => onSelect(vehicle.vehicle_id)}
+              >
                 <div className="avatar">{profile.driverInitials}</div>
                 <div className="roster-info">
                   <h5>

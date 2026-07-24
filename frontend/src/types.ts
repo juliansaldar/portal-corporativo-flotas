@@ -13,3 +13,12 @@ export interface ChatMessage {
   role: 'user' | 'assistant'
   text: string
 }
+
+export interface TelemetryEvent {
+  event_id: string
+  vehicle_id: string
+  lat: number
+  lon: number
+  speed_kmh: number
+  timestamp: string
+}
