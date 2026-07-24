@@ -17,12 +17,16 @@ Frontend (React) ─────────────────► api-gate
 
 - **`backend/ingestion-service`** — ingress HTTP (`/v1/telemetry`, `/v1/telemetry/bulk`) → Redpanda (bus de eventos, API-compatible con Kafka) → consumer idempotente → TimescaleDB. Calcula `stopped_duration` y pertenencia a `CriticalZone` por vehículo.
 - **`backend/api-gateway`** — REST/SSE, agente de IA (Gemini, tool-use directo sobre `query_vehicle_state`), llama a `ingestion-service` y a Gemini detrás de Circuit Breakers independientes.
-- **`frontend`** — React + Vite: mapa (Leaflet), panel de alertas derivado del stream, chat con el agente.
-- **`mobile`** — Expo/React Native: captura de coordenadas offline-first (cola SQLite) con sincronización en bloque al reconectar.
+- **`frontend`** — React + Vite: mapa (Leaflet), panel de alertas derivado del stream, chat con el agente, resumen de flota, roster de vehículos y guantera digital (ver nota de datos dummy más abajo).
+- **`mobile`** — Expo/React Native: captura de coordenadas offline-first (cola SQLite) con sincronización en bloque al reconectar, con pantallas de Inicio/Rastreo/Guantera/SOS por pestañas.
 - **`load-testing`** — script k6 de carga y caos (10% duplicados, 5% errores inyectados).
 - **`infra`** — Terraform de referencia para AWS (documentación, **no se aplica**).
 
-Cada bloque del enunciado (A-E) corresponde a un change de OpenSpec archivado: `telemetry-ingestion`, `fleet-ai-agent`, `web-portal-dashboard`, `driver-mobile-app`, `chaos-load-testing-iac`.
+Cada bloque del enunciado (A-E) corresponde a un change de OpenSpec archivado: `telemetry-ingestion`, `fleet-ai-agent`, `web-portal-dashboard`, `driver-mobile-app`, `chaos-load-testing-iac`, `driver-experience-visual-refresh`.
+
+### Nota sobre datos de presentación (dummy)
+
+El rediseño visual (change `driver-experience-visual-refresh`) sigue el mockup `info/simon_app_mockup_preview.html`. El roster de vehículos del portal y la "Guantera Digital" (portal y app móvil) muestran **placa, modelo, conductor y documentos (SOAT/tecnomecánica) de ejemplo** — datos de presentación fijos en `frontend/src/data/dummyVehicleProfiles.ts` y `mobile/src/data/dummyVehicleProfile.ts`, no telemetría real ni un backend de documentos. La posición, velocidad, zona y tiempo detenido que sí se muestran junto a ellos **sí son reales**, calculados por `ingestion-service` a partir de la telemetría. En la app móvil, las pestañas Guantera y SOS son vistas placeholder explícitas que no realizan ninguna llamada de red.
 
 ## Cómo ejecutar
 

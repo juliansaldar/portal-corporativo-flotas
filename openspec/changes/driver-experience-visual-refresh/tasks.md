@@ -25,7 +25,7 @@
 
 ## 4. Cierre
 
-- [ ] 4.1 Actualizar `README.md`: mencionar el nuevo roster/guantera dummy como datos de presentación (no confundir con telemetría real) y las nuevas pantallas de la app móvil.
-- [ ] 4.2 `openspec validate driver-experience-visual-refresh --strict` sin errores.
+- [x] 4.1 Actualizar `README.md`: mencionar el nuevo roster/guantera dummy como datos de presentación (no confundir con telemetría real) y las nuevas pantallas de la app móvil.
+- [x] 4.2 `openspec validate driver-experience-visual-refresh --strict` sin errores.
 - [ ] 4.3 Commits en Conventional Commits por grupo de tareas completado; merge a `main` cuando el change esté verificado.
 - [ ] 4.4 `openspec archive driver-experience-visual-refresh` al cerrar.
