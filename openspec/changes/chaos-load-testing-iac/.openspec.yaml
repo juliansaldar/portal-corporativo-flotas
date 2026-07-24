@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-07-23
+goal: Simular cientos de vehiculos con 10% duplicados y 5% errores; Terraform
+  documental; hardening final de docker-compose

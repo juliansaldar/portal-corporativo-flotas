@@ -68,7 +68,6 @@ class TimescaleVehicleRepository:
                 """
                 INSERT INTO vehicle_telemetry (event_id, vehicle_id, lat, lon, speed_kmh, ts)
                 VALUES ($1, $2, $3, $4, $5, $6)
-                ON CONFLICT (vehicle_id, ts) DO NOTHING
                 """,
                 event.event_id,
                 event.vehicle_id,
