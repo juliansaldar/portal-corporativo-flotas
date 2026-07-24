@@ -10,6 +10,13 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-flash-latest"
 
+    redpanda_brokers: str = "localhost:19092"
+    kafka_topic: str = "telemetry.raw"
+    # group_id propio y distinto al de ingestion-service ("ingestion-service"):
+    # compartirlo haria que ambos servicios compitan por las mismas particiones
+    # y cada uno solo vea una fraccion de los eventos.
+    kafka_consumer_group: str = "api-gateway-live-events"
+
     ingestion_breaker_failure_threshold: int = 5
     ingestion_breaker_reset_timeout_seconds: float = 30.0
 

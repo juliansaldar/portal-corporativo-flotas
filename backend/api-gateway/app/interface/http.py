@@ -17,11 +17,13 @@ from app.application.query_vehicle_state import query_vehicle_state
 from app.infrastructure.config import settings
 from app.infrastructure.gemini_client import GeminiChatModel
 from app.infrastructure.ingestion_client import IngestionServiceClient
+from app.infrastructure.live_telemetry_broadcaster import LiveTelemetryBroadcaster
 
 
 class AppState:
     ingestion_client: IngestionServiceClient
     chat_model: GeminiChatModel
+    live_telemetry: LiveTelemetryBroadcaster
 
 
 state = AppState()
@@ -40,9 +42,14 @@ async def lifespan(_: FastAPI):
     )
     state.ingestion_client = IngestionServiceClient(settings.ingestion_service_url, ingestion_breaker)
     state.chat_model = GeminiChatModel(settings.gemini_api_key, settings.gemini_model, gemini_breaker)
+    state.live_telemetry = LiveTelemetryBroadcaster(
+        settings.redpanda_brokers, settings.kafka_topic, settings.kafka_consumer_group
+    )
+    await state.live_telemetry.start()
 
     yield
 
+    await state.live_telemetry.stop()
     await state.ingestion_client.aclose()
 
 
@@ -100,6 +107,16 @@ async def _vehicle_event_stream():
 @app.get("/v1/vehicles/stream")
 async def get_vehicles_stream() -> StreamingResponse:
     return StreamingResponse(_vehicle_event_stream(), media_type="text/event-stream")
+
+
+async def _vehicle_events_stream(vehicle_id: str):
+    async for event in state.live_telemetry.subscribe(vehicle_id):
+        yield f"data: {event.model_dump_json()}\n\n"
+
+
+@app.get("/v1/vehicles/{vehicle_id}/events/stream")
+async def get_vehicle_events_stream(vehicle_id: str) -> StreamingResponse:
+    return StreamingResponse(_vehicle_events_stream(vehicle_id), media_type="text/event-stream")
 
 
 class ChatRequest(BaseModel):
