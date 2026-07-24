@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { LeafletMapView } from '../components/LeafletMapView'
 import type { TelemetryEvent } from '../types'
 
 interface TrackingScreenProps {
@@ -24,16 +25,16 @@ export function TrackingScreen({
 }: TrackingScreenProps) {
   return (
     <View style={styles.screen}>
-      <View style={styles.mapPlaceholder}>
+      <View style={styles.mapContainer}>
+        <LeafletMapView
+          lat={lastEvent?.lat ?? null}
+          lon={lastEvent?.lon ?? null}
+          speedKmh={lastEvent?.speed_kmh}
+        />
         <View style={styles.searchPill}>
           <Text style={styles.searchPillText}>
             {isTracking ? '🟢 Rastreo en Vivo' : '⚪ Rastreo detenido'} • {vehicleId}
           </Text>
-        </View>
-        <View style={styles.pinWrap}>
-          <View style={styles.pulseCircle}>
-            <View style={styles.carDot} />
-          </View>
         </View>
       </View>
 
@@ -93,9 +94,8 @@ export function TrackingScreen({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#0b1015' },
-  mapPlaceholder: {
+  mapContainer: {
     flex: 1,
-    backgroundColor: '#0b1015',
     position: 'relative',
   },
   searchPill: {
@@ -111,29 +111,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   searchPillText: { color: '#f5f7fa', fontSize: 11 },
-  pinWrap: {
-    position: 'absolute',
-    top: '40%',
-    left: '45%',
-  },
-  pulseCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(0,255,194,0.15)',
-    borderWidth: 1.5,
-    borderColor: '#00ffc2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  carDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#00ffc2',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
   bottomSheet: {
     backgroundColor: '#0c0c12',
     borderTopLeftRadius: 24,
