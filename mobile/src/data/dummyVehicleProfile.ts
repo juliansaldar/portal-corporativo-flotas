@@ -17,10 +17,10 @@ export interface DummyVehicleProfile {
 }
 
 export const DUMMY_VEHICLE_PROFILE: DummyVehicleProfile = {
-  plate: 'XYZ-123',
+  plate: 'VIH-100',
   model: 'Toyota Corolla',
-  driverName: 'Juan Delgado',
-  driverInitials: 'JD',
+  driverName: 'Julian Saldarriaga',
+  driverInitials: 'JS',
   documents: [
     { name: 'SOAT Vehicular', issuer: 'Sura Seguros', expiresAt: '2026-08-05' },
     { name: 'Tecnomecánica', issuer: 'CDA Autonorte', expiresAt: '2026-11-10' },
