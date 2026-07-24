@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { postTelemetry, postTelemetryBulk } from '../api/telemetryApi'
 import { countPendingEvents, getPendingEvents, insertPendingEvent, markEventsSynced } from '../db/database'
+import { SYNC_RETRY_INTERVAL_MS } from '../config'
 import type { TelemetryEvent } from '../types'
 import { useNetworkStatus } from './useNetworkStatus'
 
@@ -8,7 +9,10 @@ import { useNetworkStatus } from './useNetworkStatus'
  * Offline-first: cada evento se persiste en SQLite antes de intentar
  * enviarlo. Si hay red, se intenta un envio inmediato; si no hay red o el
  * envio falla, el evento queda pendiente. Al detectar la transicion
- * offline -> online se sincroniza todo el pendiente en un solo POST /bulk.
+ * offline -> online se sincroniza todo el pendiente en un solo POST /bulk,
+ * y mientras siga online se reintenta cada SYNC_RETRY_INTERVAL_MS por si
+ * el POST individual/bulk fallo por un backend inalcanzable (isOnline
+ * refleja la conectividad de red, no si el backend responde).
  */
 export function useTelemetrySync() {
   const isOnline = useNetworkStatus()
@@ -54,6 +58,12 @@ export function useTelemetrySync() {
       void syncPending()
     }
     wasOnline.current = isOnline
+  }, [isOnline, syncPending])
+
+  useEffect(() => {
+    if (!isOnline) return
+    const id = setInterval(() => void syncPending(), SYNC_RETRY_INTERVAL_MS)
+    return () => clearInterval(id)
   }, [isOnline, syncPending])
 
   return { isOnline, pendingCount, recordEvent, syncPending }

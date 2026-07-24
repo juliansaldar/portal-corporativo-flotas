@@ -12,7 +12,7 @@ import { useTelemetrySync } from './src/hooks/useTelemetrySync'
 import type { TelemetryEvent } from './src/types'
 
 const VEHICLE_ID_SETTING_KEY = 'vehicle_id'
-const DEFAULT_VEHICLE_ID = 'veh-mobile-1'
+const DEFAULT_VEHICLE_ID = 'ABC-123'
 
 export default function App() {
   const [vehicleId, setVehicleId] = useState(DEFAULT_VEHICLE_ID)
