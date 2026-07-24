@@ -18,12 +18,14 @@ export interface DummyVehicleProfile {
   documents: DummyDocument[]
 }
 
+// Debe coincidir con mobile/src/data/dummyVehicleProfile.ts (el perfil que la
+// app movil muestra para si misma) — ver getVehicleProfile mas abajo.
 export const DUMMY_VEHICLE_PROFILES: DummyVehicleProfile[] = [
   {
-    plate: 'XYZ-123',
+    plate: 'VIH-100',
     model: 'Toyota Corolla',
-    driverName: 'Juan Delgado',
-    driverInitials: 'JD',
+    driverName: 'Julian Saldarriaga',
+    driverInitials: 'JS',
     documents: [
       { name: 'SOAT Vehicular', issuer: 'Sura Seguros', expiresAt: '2026-08-05' },
       { name: 'Tecnomecánica', issuer: 'CDA Autonorte', expiresAt: '2026-11-10' },
@@ -81,7 +83,14 @@ export const DUMMY_VEHICLE_PROFILES: DummyVehicleProfile[] = [
   },
 ]
 
+// Debe coincidir con DEFAULT_VEHICLE_ID en mobile/App.tsx: es el vehicle_id
+// real que reporta la app movil del usuario, no un id de ejemplo generico.
+export const MOBILE_APP_DEFAULT_VEHICLE_ID = 'veh-mobile-1'
+
 export function getVehicleProfile(vehicleId: string): DummyVehicleProfile {
+  if (vehicleId === MOBILE_APP_DEFAULT_VEHICLE_ID) {
+    return DUMMY_VEHICLE_PROFILES[0]
+  }
   const hash = Array.from(vehicleId).reduce((sum, char) => sum + char.charCodeAt(0), 0)
   return DUMMY_VEHICLE_PROFILES[hash % DUMMY_VEHICLE_PROFILES.length]
 }

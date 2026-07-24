@@ -1,6 +1,12 @@
 /**
  * Dato de presentacion (demo) del vehiculo del conductor, no telemetria real.
  * Ver design.md de driver-experience-visual-refresh, decision 1.
+ *
+ * Este es el perfil de referencia: frontend/src/data/dummyVehicleProfiles.ts
+ * lo replica para que el vehicle_id por defecto de esta app (DEFAULT_VEHICLE_ID
+ * en App.tsx, 'veh-mobile-1') se vea igual en el roster del portal web. Si
+ * cambias algo aqui, actualiza tambien ese archivo (ver mobile-web-dummy-
+ * profile-match).
  */
 export interface DummyDocument {
   name: string
