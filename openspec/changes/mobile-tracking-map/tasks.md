@@ -14,11 +14,11 @@
 
 - [x] 3.1 `npx tsc --noEmit` limpio.
 - [x] 3.2 `npx expo export --platform ios` bundle limpio (mismo método de verificación headless ya usado en este proyecto). 626 módulos, sin errores.
-- [ ] 3.3 Verificación en vivo pedida al usuario: reabrir la app en su iPhone físico vía Expo Go, confirmar que el mapa carga, muestra la posición real, y el marcador se mueve al capturar una nueva posición sin recargar el mapa.
+- [x] 3.3 Verificación en vivo pedida al usuario: reabrir la app en su iPhone físico vía Expo Go, confirmar que el mapa carga, muestra la posición real, y el marcador se mueve al capturar una nueva posición sin recargar el mapa. Confirmado por el usuario: el mapa carga bien.
 
 ## 4. Cierre
 
 - [x] 4.1 Actualizar `README.md` (sección de la app móvil / decisiones) mencionando el mapa real y la elección de `react-native-webview` sobre `react-native-maps`/`expo-maps`.
-- [ ] 4.2 `openspec validate mobile-tracking-map --strict` sin errores.
-- [ ] 4.3 Commits en Conventional Commits.
-- [ ] 4.4 `openspec archive mobile-tracking-map` al cerrar.
+- [x] 4.2 `openspec validate mobile-tracking-map --strict` sin errores.
+- [x] 4.3 Commits en Conventional Commits.
+- [x] 4.4 `openspec archive mobile-tracking-map` al cerrar.
