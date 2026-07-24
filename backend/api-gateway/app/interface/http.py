@@ -14,14 +14,14 @@ from shared.resilience import CircuitBreaker, CircuitBreakerOpenError
 
 from app.application.agent_chat import run_agent_chat
 from app.application.query_vehicle_state import query_vehicle_state
-from app.infrastructure.anthropic_client import AnthropicChatModel
 from app.infrastructure.config import settings
+from app.infrastructure.gemini_client import GeminiChatModel
 from app.infrastructure.ingestion_client import IngestionServiceClient
 
 
 class AppState:
     ingestion_client: IngestionServiceClient
-    chat_model: AnthropicChatModel
+    chat_model: GeminiChatModel
 
 
 state = AppState()
@@ -34,12 +34,12 @@ async def lifespan(_: FastAPI):
         failure_threshold=settings.ingestion_breaker_failure_threshold,
         reset_timeout_seconds=settings.ingestion_breaker_reset_timeout_seconds,
     )
-    anthropic_breaker = CircuitBreaker(
-        failure_threshold=settings.anthropic_breaker_failure_threshold,
-        reset_timeout_seconds=settings.anthropic_breaker_reset_timeout_seconds,
+    gemini_breaker = CircuitBreaker(
+        failure_threshold=settings.gemini_breaker_failure_threshold,
+        reset_timeout_seconds=settings.gemini_breaker_reset_timeout_seconds,
     )
     state.ingestion_client = IngestionServiceClient(settings.ingestion_service_url, ingestion_breaker)
-    state.chat_model = AnthropicChatModel(settings.anthropic_api_key, settings.anthropic_model, anthropic_breaker)
+    state.chat_model = GeminiChatModel(settings.gemini_api_key, settings.gemini_model, gemini_breaker)
 
     yield
 

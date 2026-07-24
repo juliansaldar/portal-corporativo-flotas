@@ -18,11 +18,11 @@ TBD - created by archiving change fleet-ai-agent. Update Purpose after archive.
 - **THEN** el breaker se abre y las llamadas siguientes de `api-gateway` fallan rápido sin llegar a `ingestion-service`
 
 ### Requirement: Manejo seguro de secretos
-`api-gateway` SHALL leer `ANTHROPIC_API_KEY` únicamente desde variables de entorno server-side y SHALL NOT exponerla en ninguna respuesta.
+`api-gateway` SHALL leer `GEMINI_API_KEY` únicamente desde variables de entorno server-side y SHALL NOT exponerla en ninguna respuesta.
 
 #### Scenario: La API key nunca se expone
 - **WHEN** un cliente llama a cualquier endpoint público de `api-gateway`
-- **THEN** ninguna respuesta (incluyendo errores) contiene el valor de `ANTHROPIC_API_KEY`
+- **THEN** ninguna respuesta (incluyendo errores) contiene el valor de `GEMINI_API_KEY`
 
 ### Requirement: Stream de estado de vehículos
 `api-gateway` SHALL exponer `GET /v1/vehicles/stream` (SSE) que empuja periódicamente el estado actual de todos los vehículos, reutilizando el mismo cliente y `CircuitBreaker` hacia `ingestion-service` que ya usa el resto del servicio.

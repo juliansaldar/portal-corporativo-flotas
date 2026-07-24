@@ -102,7 +102,7 @@ resource "aws_ecs_task_definition" "api_gateway" {
       { name = "INGESTION_SERVICE_URL", value = "http://${aws_lb.main.dns_name}/ingestion" },
     ]
     secrets = [
-      # En un despliegue real: ANTHROPIC_API_KEY vendria de AWS Secrets Manager,
+      # En un despliegue real: GEMINI_API_KEY vendria de AWS Secrets Manager,
       # nunca como variable de entorno plana en el repo.
     ]
     logConfiguration = {

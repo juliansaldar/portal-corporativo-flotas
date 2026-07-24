@@ -3,7 +3,7 @@
 Se implementa a mano (en vez de sumar una libreria como `purgatory` o
 `aiobreaker`) porque el requisito es un unico patron closed/open/half-open
 reutilizable entre `api-gateway` -> `ingestion-service` y `api-gateway` ->
-Anthropic: una dependencia extra no aporta nada que no se pueda auditar en
+Gemini: una dependencia extra no aporta nada que no se pueda auditar en
 ~60 lineas propias.
 """
 
