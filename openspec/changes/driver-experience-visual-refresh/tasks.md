@@ -15,12 +15,12 @@
 
 ## 3. Mobile: navegación y pantallas
 
-- [ ] 3.1 `mobile/src/navigation/BottomTabBar.tsx`: componente de presentación puro (4 items, `active`/`onSelect`), estilo del mockup.
-- [ ] 3.2 `mobile/src/screens/HomeScreen.tsx`: hero card de estado (tracking activo/detenido, `vehicle_id`, conectividad, pendientes) + guantera digital dummy (1.2), recibe todo por props desde `App.tsx`.
-- [ ] 3.3 `mobile/src/screens/TrackingScreen.tsx`: bottom sheet con última posición conocida, estado online/offline, pendientes, y los controles reales (iniciar/detener tracking, sincronizar ahora) — reutiliza las mismas props/callbacks que hoy usa `App.tsx`, sin nueva lógica de estado.
-- [ ] 3.4 Vistas placeholder `GloveboxScreen`/`SosScreen`: contenido estático o mensaje "Próximamente", sin llamadas de red.
-- [ ] 3.5 Reescribir `mobile/App.tsx` para orquestar hooks existentes + estado de tab activo, delegando el render a las pantallas de 3.2-3.4.
-- [ ] 3.6 `npx tsc --noEmit` limpio.
+- [x] 3.1 `mobile/src/navigation/BottomTabBar.tsx`: componente de presentación puro (4 items, `active`/`onSelect`), estilo del mockup.
+- [x] 3.2 `mobile/src/screens/HomeScreen.tsx`: hero card de estado (tracking activo/detenido, `vehicle_id`, conectividad, pendientes) + guantera digital dummy (1.2), recibe todo por props desde `App.tsx`.
+- [x] 3.3 `mobile/src/screens/TrackingScreen.tsx`: bottom sheet con última posición conocida, estado online/offline, pendientes, y los controles reales (iniciar/detener tracking, sincronizar ahora) — reutiliza las mismas props/callbacks que hoy usa `App.tsx`, sin nueva lógica de estado.
+- [x] 3.4 Vistas placeholder `GloveboxScreen`/`SosScreen`: contenido estático o mensaje "Próximamente", sin llamadas de red.
+- [x] 3.5 Reescribir `mobile/App.tsx` para orquestar hooks existentes + estado de tab activo, delegando el render a las pantallas de 3.2-3.4.
+- [x] 3.6 `npx tsc --noEmit` limpio.
 - [ ] 3.7 Confirmar con el usuario que puede relanzar `npx expo start` en su terminal y que tracking/sync siguen funcionando (bundle de Metro exitoso, sin regresión funcional).
 
 ## 4. Cierre

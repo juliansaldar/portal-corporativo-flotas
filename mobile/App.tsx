@@ -1,17 +1,34 @@
 import { StatusBar } from 'expo-status-bar'
 import { useCallback, useEffect, useState } from 'react'
-import { Button, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { SafeAreaView, StyleSheet } from 'react-native'
+import { BottomTabBar, type TabKey } from './src/navigation/BottomTabBar'
+import { GloveboxScreen } from './src/screens/GloveboxScreen'
+import { HomeScreen } from './src/screens/HomeScreen'
+import { SosScreen } from './src/screens/SosScreen'
+import { TrackingScreen } from './src/screens/TrackingScreen'
 import { getSetting, setSetting } from './src/db/database'
 import { useLocationTracking } from './src/hooks/useLocationTracking'
 import { useTelemetrySync } from './src/hooks/useTelemetrySync'
+import type { TelemetryEvent } from './src/types'
 
 const VEHICLE_ID_SETTING_KEY = 'vehicle_id'
 const DEFAULT_VEHICLE_ID = 'veh-mobile-1'
 
 export default function App() {
   const [vehicleId, setVehicleId] = useState(DEFAULT_VEHICLE_ID)
+  const [activeTab, setActiveTab] = useState<TabKey>('home')
+  const [lastEvent, setLastEvent] = useState<TelemetryEvent | null>(null)
   const { isOnline, pendingCount, recordEvent, syncPending } = useTelemetrySync()
-  const { isTracking, error, start, stop } = useLocationTracking(vehicleId, recordEvent)
+
+  const handleCapture = useCallback(
+    (event: TelemetryEvent) => {
+      setLastEvent(event)
+      void recordEvent(event)
+    },
+    [recordEvent],
+  )
+
+  const { isTracking, error, start, stop } = useLocationTracking(vehicleId, handleCapture)
 
   useEffect(() => {
     getSetting(VEHICLE_ID_SETTING_KEY).then((stored) => {
@@ -26,37 +43,33 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>App del Conductor</Text>
-
-      <Text style={styles.label}>Vehículo</Text>
-      <TextInput
-        style={styles.input}
-        value={vehicleId}
-        onChangeText={handleVehicleIdChange}
-        editable={!isTracking}
-        placeholder="ID del vehiculo"
-      />
-
-      <View style={styles.statusRow}>
-        <Text style={[styles.statusDot, isOnline ? styles.online : styles.offline]}>●</Text>
-        <Text>{isOnline ? 'En línea' : 'Sin conexión'}</Text>
-      </View>
-
-      <Text style={styles.pending}>{pendingCount} evento(s) pendientes de sincronizar</Text>
-
-      {error && <Text style={styles.error}>{error}</Text>}
-
-      <View style={styles.buttonRow}>
-        <Button
-          title={isTracking ? 'Detener tracking' : 'Iniciar tracking'}
-          onPress={isTracking ? stop : start}
+      {activeTab === 'home' && (
+        <HomeScreen
+          vehicleId={vehicleId}
+          onVehicleIdChange={handleVehicleIdChange}
+          isTracking={isTracking}
+          isOnline={isOnline}
+          pendingCount={pendingCount}
+          trackingError={error}
         />
-      </View>
-      <View style={styles.buttonRow}>
-        <Button title="Sincronizar ahora" onPress={() => void syncPending()} disabled={!isOnline} />
-      </View>
+      )}
+      {activeTab === 'tracking' && (
+        <TrackingScreen
+          vehicleId={vehicleId}
+          isTracking={isTracking}
+          isOnline={isOnline}
+          pendingCount={pendingCount}
+          lastEvent={lastEvent}
+          onStart={start}
+          onStop={stop}
+          onSyncNow={() => void syncPending()}
+        />
+      )}
+      {activeTab === 'glovebox' && <GloveboxScreen />}
+      {activeTab === 'sos' && <SosScreen />}
 
-      <StatusBar style="auto" />
+      <BottomTabBar active={activeTab} onSelect={setActiveTab} />
+      <StatusBar style="light" />
     </SafeAreaView>
   )
 }
@@ -64,48 +77,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
-    padding: 24,
-    gap: 12,
-  },
-  title: {
-    color: '#f5f7fa',
-    fontSize: 22,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  label: {
-    color: '#a7b4c2',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#333',
-    borderRadius: 8,
-    padding: 10,
-    color: '#f5f7fa',
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 12,
-  },
-  statusDot: {
-    fontSize: 12,
-  },
-  online: {
-    color: '#2ad67a',
-  },
-  offline: {
-    color: '#ff4d4d',
-  },
-  pending: {
-    color: '#a7b4c2',
-  },
-  error: {
-    color: '#ff4d4d',
-  },
-  buttonRow: {
-    marginTop: 12,
+    backgroundColor: '#080808',
   },
 })
