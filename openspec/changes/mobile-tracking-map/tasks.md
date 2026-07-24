@@ -18,7 +18,7 @@
 
 ## 4. Cierre
 
-- [ ] 4.1 Actualizar `README.md` (sección de la app móvil / decisiones) mencionando el mapa real y la elección de `react-native-webview` sobre `react-native-maps`/`expo-maps`.
+- [x] 4.1 Actualizar `README.md` (sección de la app móvil / decisiones) mencionando el mapa real y la elección de `react-native-webview` sobre `react-native-maps`/`expo-maps`.
 - [ ] 4.2 `openspec validate mobile-tracking-map --strict` sin errores.
 - [ ] 4.3 Commits en Conventional Commits.
 - [ ] 4.4 `openspec archive mobile-tracking-map` al cerrar.
