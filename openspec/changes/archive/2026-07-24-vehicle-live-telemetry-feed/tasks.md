@@ -25,4 +25,4 @@
 - [x] 4.2 Actualizar `README.md`: documentar el nuevo endpoint y la feature del portal, y la nota de que el feed es efímero (no persiste tras un reinicio de `api-gateway`).
 - [x] 4.3 `openspec validate vehicle-live-telemetry-feed --strict` sin errores.
 - [x] 4.4 Commits en Conventional Commits por grupo de tareas completado.
-- [ ] 4.5 `openspec archive vehicle-live-telemetry-feed` al cerrar.
+- [x] 4.5 `openspec archive vehicle-live-telemetry-feed` al cerrar.
