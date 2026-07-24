@@ -28,19 +28,239 @@
   font-size: 0.85rem;
 }
 
+/* Hero / fleet summary card */
+.hero-card {
+  margin: 1rem 1rem 0 1rem;
+  background: linear-gradient(135deg, #111b24 0%, #0c131a 100%);
+  border-color: rgba(0, 255, 194, 0.25);
+}
+
+.hero-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.badge-protected {
+  background: rgba(0, 255, 194, 0.15);
+  color: var(--primary);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+}
+
+.signal {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.metrics-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.metric-item span {
+  font-size: 0.65rem;
+  color: var(--muted-foreground);
+  letter-spacing: 0.02em;
+}
+
+.metric-item strong {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.text-success {
+  color: var(--success);
+}
+
+.text-destructive {
+  color: var(--destructive);
+}
+
 .dashboard {
   flex: 1;
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1.4fr 1fr 1fr;
   gap: 1rem;
   padding: 1rem;
   min-height: 0;
 }
 
 .map-panel {
-  grid-row: 1 / span 2;
   padding: 0;
+  min-height: 320px;
+}
+
+.side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0;
+}
+
+.side-column .panel {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Roster panel */
+.roster-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roster-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+
+.roster-row .avatar {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  background: var(--muted);
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roster-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.roster-info h5 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roster-info p {
+  font-size: 0.72rem;
+  color: var(--muted-foreground);
+}
+
+.plate {
+  color: var(--primary);
+}
+
+.tag-alert {
+  background: rgba(255, 181, 71, 0.15);
+  color: var(--warning);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.roster-more {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+/* Glovebox card */
+.glovebox-subtitle {
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.glovebox-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.list-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+
+.icon-box {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.bg-cyan {
+  background: rgba(0, 255, 194, 0.12);
+  color: var(--primary);
+}
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-info h5 {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.card-info p {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+}
+
+.tag-warning {
+  background: rgba(255, 181, 71, 0.15);
+  color: var(--warning);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  white-space: nowrap;
 }
 
 .alerts-panel ul {
@@ -108,14 +328,23 @@
   flex: 1;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
   .dashboard {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
+    grid-template-columns: 1fr 1fr;
   }
 
   .map-panel {
-    grid-row: auto;
+    grid-column: 1 / span 2;
     height: 40vh;
+  }
+}
+
+@media (max-width: 720px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .map-panel {
+    grid-column: auto;
   }
 }

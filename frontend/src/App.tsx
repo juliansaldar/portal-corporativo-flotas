@@ -3,7 +3,10 @@ import './App.css'
 import logo from './assets/logo.png'
 import { AlertsPanel } from './components/AlertsPanel'
 import { ChatPanel } from './components/ChatPanel'
+import { FleetSummaryCard } from './components/FleetSummaryCard'
+import { GloveboxCard } from './components/GloveboxCard'
 import { MapView } from './components/MapView'
+import { VehicleRosterPanel } from './components/VehicleRosterPanel'
 import { useVehicleStream } from './hooks/useVehicleStream'
 import { deriveAlerts } from './lib/alerts'
 
@@ -19,12 +22,19 @@ function App() {
         <h1>Monitoreo de Flotas</h1>
         {streamError && <span className="stream-error">{streamError}</span>}
       </header>
+      <FleetSummaryCard vehicles={vehicles} alerts={alerts} />
       <main className="dashboard">
         <div className="panel map-panel">
           <MapView vehicles={vehicles} alertVehicleIds={alertVehicleIds} />
         </div>
-        <AlertsPanel alerts={alerts} />
-        <ChatPanel />
+        <div className="side-column">
+          <AlertsPanel alerts={alerts} />
+          <ChatPanel />
+        </div>
+        <div className="side-column">
+          <VehicleRosterPanel vehicles={vehicles} alertVehicleIds={alertVehicleIds} />
+          <GloveboxCard />
+        </div>
       </main>
     </div>
   )
