@@ -358,6 +358,12 @@
   background: var(--surface);
   border-radius: var(--radius);
   font-size: 0.78rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.feed-row--selected {
+  border-color: var(--primary);
 }
 
 .feed-time {

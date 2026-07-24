@@ -10,15 +10,22 @@ import { VehicleEventFeedPanel } from './components/VehicleEventFeedPanel'
 import { VehicleRosterPanel } from './components/VehicleRosterPanel'
 import { useVehicleStream } from './hooks/useVehicleStream'
 import { deriveAlerts } from './lib/alerts'
+import type { TelemetryEvent } from './types'
 
 function App() {
   const { vehicles, streamError } = useVehicleStream()
   const alerts = useMemo(() => deriveAlerts(vehicles), [vehicles])
   const alertVehicleIds = useMemo(() => new Set(alerts.map((v) => v.vehicle_id)), [alerts])
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null)
+  const [focusedEvent, setFocusedEvent] = useState<TelemetryEvent | null>(null)
 
   const handleSelectVehicle = (vehicleId: string) => {
     setSelectedVehicleId((current) => (current === vehicleId ? null : vehicleId))
+    setFocusedEvent(null)
+  }
+
+  const handleFocusEvent = (event: TelemetryEvent | null) => {
+    setFocusedEvent((current) => (current?.event_id === event?.event_id ? null : event))
   }
 
   return (
@@ -31,7 +38,7 @@ function App() {
       <FleetSummaryCard vehicles={vehicles} alerts={alerts} />
       <main className="dashboard">
         <div className="panel map-panel">
-          <MapView vehicles={vehicles} alertVehicleIds={alertVehicleIds} />
+          <MapView vehicles={vehicles} alertVehicleIds={alertVehicleIds} focusedEvent={focusedEvent} />
         </div>
         <div className="side-column">
           <AlertsPanel alerts={alerts} />
@@ -47,7 +54,13 @@ function App() {
           <GloveboxCard />
         </div>
       </main>
-      {selectedVehicleId && <VehicleEventFeedPanel vehicleId={selectedVehicleId} />}
+      {selectedVehicleId && (
+        <VehicleEventFeedPanel
+          vehicleId={selectedVehicleId}
+          focusedEventId={focusedEvent?.event_id ?? null}
+          onFocusEvent={handleFocusEvent}
+        />
+      )}
     </div>
   )
 }
