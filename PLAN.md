@@ -1,5 +1,7 @@
 # Plan: Ejecutar la prueba técnica con Spec-Driven Development (OpenSpec)
 
+> **Actualización posterior:** el agente de IA se migró de Anthropic Claude a **Gemini** (`google-genai`) durante el desarrollo, para poder usar el free tier de Gemini y validar el flujo end-to-end sin depender de créditos de pago. Las referencias a "Anthropic" más abajo documentan la decisión original de esta sesión de planificación; el detalle de la migración y el bug de arranque que encontró y corrigió en el proceso están en el caso 6 de la Auditoría de IA del `README.md`.
+
 ## Contexto
 El take-home ("Portal Corporativo de Monitoreo de Flotas") pide 5 bloques (ingesta orientada a eventos, agente de IA, portal web, app móvil offline-first, infra/caos), evaluando explícitamente el uso disciplinado de IA agéntica y la calidad arquitectónica. El usuario quiere ejecutarlo con **OpenSpec** (ya instalado globalmente, v1.5.0, schema `spec-driven`: proposal → specs → design → tasks → apply → archive), con **git de historial detallado** bajo la cuenta de GitHub `juliansaldar@gmail.com`. Decisiones ya confirmadas por el usuario:
 - Backend: **Python + FastAPI** (no Node/NestJS ni Go).

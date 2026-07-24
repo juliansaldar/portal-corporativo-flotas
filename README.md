@@ -10,13 +10,13 @@ Mobile (Expo, offline-first) ─┐
 k6 (carga/caos) ───────────────┘         │                                        │
                                           │ (circuit breaker)                     │
                                           ▼                                       │
-Frontend (React) ─────────────────► api-gateway ◄── Anthropic (tool-use) ─────────┘
+Frontend (React) ─────────────────► api-gateway ◄── Gemini (tool-use) ────────────┘
                     (circuit breaker)     │
                                           └─► GET /v1/vehicles/state (circuit breaker)
 ```
 
 - **`backend/ingestion-service`** — ingress HTTP (`/v1/telemetry`, `/v1/telemetry/bulk`) → Redpanda (bus de eventos, API-compatible con Kafka) → consumer idempotente → TimescaleDB. Calcula `stopped_duration` y pertenencia a `CriticalZone` por vehículo.
-- **`backend/api-gateway`** — REST/SSE, agente de IA (Anthropic, tool-use directo sobre `query_vehicle_state`), llama a `ingestion-service` y a Anthropic detrás de Circuit Breakers independientes.
+- **`backend/api-gateway`** — REST/SSE, agente de IA (Gemini, tool-use directo sobre `query_vehicle_state`), llama a `ingestion-service` y a Gemini detrás de Circuit Breakers independientes.
 - **`frontend`** — React + Vite: mapa (Leaflet), panel de alertas derivado del stream, chat con el agente.
 - **`mobile`** — Expo/React Native: captura de coordenadas offline-first (cola SQLite) con sincronización en bloque al reconectar.
 - **`load-testing`** — script k6 de carga y caos (10% duplicados, 5% errores inyectados).
@@ -32,9 +32,10 @@ Requisitos: Docker + Docker Compose.
 git clone git@github.com:juliansaldar/portal-corporativo-flotas.git
 cd portal-corporativo-flotas
 
-# Opcional pero necesario para el chat con IA: API key de Anthropic
+# Opcional pero necesario para el chat con IA: API key de Gemini (free tier
+# disponible en https://aistudio.google.com/apikey)
 cp backend/api-gateway/.env.example backend/api-gateway/.env
-# editar backend/api-gateway/.env y pegar ANTHROPIC_API_KEY
+# editar backend/api-gateway/.env y pegar GEMINI_API_KEY
 
 docker compose up -d --build
 ```
@@ -61,7 +62,7 @@ curl -X POST http://localhost:8001/v1/telemetry -H "Content-Type: application/js
 # Ver el estado calculado (stopped_duration, zona)
 curl http://localhost:8001/internal/vehicles/state
 
-# Preguntarle al agente (requiere ANTHROPIC_API_KEY configurada y con saldo)
+# Preguntarle al agente (requiere GEMINI_API_KEY configurada)
 curl -N -X POST http://localhost:8002/v1/agent/chat -H "Content-Type: application/json" \
   -d '{"message":"¿Qué vehículos llevan detenidos más de 20 minutos en zonas críticas?"}'
 ```
@@ -117,16 +118,18 @@ Requisito fundamental de la prueba: casos reales donde el código generado con a
 
 5. **Decisión de diseño auditada y confirmada, no revertida:** el circuit breaker se implementó a mano (~60 líneas en `backend/shared/resilience/circuit_breaker.py`) en vez de sumar una librería como `purgatory` o `aiobreaker`. Se evaluó explícitamente antes de escribir código: para un patrón closed/open/half-open reutilizado en solo 3 puntos de llamada, una dependencia externa no aportaba nada que no se pudiera auditar directamente — y de hecho, tenerlo en el propio repo fue lo que permitió encontrar y corregir el caso 4 con confianza sobre su comportamiento exacto.
 
+6. **`genai.Client(api_key=...)` construido de forma anticipada rompía el arranque del servicio.** Al migrar el agente de Anthropic a Gemini (`google-genai`), la primera versión generada construía el cliente en `GeminiChatModel.__init__`, invocado desde el `lifespan` de FastAPI al levantar `api-gateway`. A diferencia de `AsyncAnthropic`, `genai.Client` valida la api_key de forma síncrona en el constructor y lanza `ValueError` de inmediato si está vacía — algo que no se detectó leyendo el código, sino corriendo la suite de tests (`pytest`) inmediatamente después del cambio: tres tests que levantan `TestClient(app)` fallaron porque el propio arranque de la app crasheaba sin `GEMINI_API_KEY` configurada (el caso real de cualquier entorno de CI o de desarrollo sin la key a mano, incluyendo este mismo). Se corrigió difiriendo la construcción del cliente al primer `send()` real, de forma que la falta de key se manifiesta como un error de la llamada — ya cubierto por el circuit breaker y por el manejo de errores del endpoint de chat (caso 4) — y no como una caída del servicio completo.
+
 ## Decisiones y recortes conscientes
 
 Detalle completo en el `design.md` de cada change archivado (`openspec/changes/archive/`). Resumen:
 
 - Redpanda en vez de Kafka+Zookeeper; TimescaleDB en vez de Cassandra/Druid (recorte justificado, no omisión).
-- Agente de IA con el SDK directo de Anthropic, sin LangChain (un solo tool determinístico no lo justifica).
+- Agente de IA con el SDK directo de Gemini (`google-genai`), sin LangChain (un solo tool determinístico no lo justifica). Migrado desde Anthropic durante el desarrollo para usar el free tier de Gemini — ver caso 6 de la Auditoría de IA; el puerto `ChatModelPort`/`ModelTurn` en `app/application/ports.py` ya estaba desacoplado del SDK concreto, así que el cambio de proveedor quedó contenido a un único adapter nuevo (`app/infrastructure/gemini_client.py`) sin tocar la capa de aplicación.
 - Frontend sirve el dev server de Vite en Docker, no un build de producción con nginx.
 - App móvil: tracking en foreground (no background real), sin build/publish real a App Store/Play Store.
 - Terraform documental, no aplicado en una cuenta AWS real.
-- **Pendiente de retomar cuando haya créditos en la cuenta de Anthropic usada para pruebas:** verificación en vivo de una respuesta real del agente (el resto del pipeline — tool-use, filtros, streaming, manejo de errores — está implementado y cubierto por tests).
+- **Pendiente de retomar cuando haya una `GEMINI_API_KEY` real configurada:** verificación en vivo de una respuesta real del agente (el resto del pipeline — tool-use, filtros, streaming, manejo de errores — está implementado y cubierto por tests, incluyendo la traducción de mensajes/tools hacia el formato de Gemini en `tests/test_gemini_client.py`).
 - **No verificado en este entorno:** la app móvil no se corrió en un simulador/dispositivo real durante el desarrollo (entorno headless sin Expo Go); se verificó type-check limpio y bundle de Metro exitoso (642 módulos). Queda pendiente probarla en un iPhone/Android real.
 
 ## Video de sustentación
