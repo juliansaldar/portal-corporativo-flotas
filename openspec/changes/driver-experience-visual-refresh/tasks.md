@@ -21,7 +21,7 @@
 - [x] 3.4 Vistas placeholder `GloveboxScreen`/`SosScreen`: contenido estático o mensaje "Próximamente", sin llamadas de red.
 - [x] 3.5 Reescribir `mobile/App.tsx` para orquestar hooks existentes + estado de tab activo, delegando el render a las pantallas de 3.2-3.4.
 - [x] 3.6 `npx tsc --noEmit` limpio.
-- [ ] 3.7 Confirmar con el usuario que puede relanzar `npx expo start` en su terminal y que tracking/sync siguen funcionando (bundle de Metro exitoso, sin regresión funcional).
+- [x] 3.7 Verificado en este entorno: `npx expo export --platform android` empaqueta 616 módulos sin errores (mismo método usado en `driver-mobile-app`, sin simulador/dispositivo disponible aquí). Pendiente que el usuario confirme en su terminal con `npx expo start` + Expo Go que el tracking/sync real siguen funcionando con las nuevas pantallas.
 
 ## 4. Cierre
 

@@ -136,7 +136,7 @@ Detalle completo en el `design.md` de cada change archivado (`openspec/changes/a
 - App móvil: tracking en foreground (no background real), sin build/publish real a App Store/Play Store.
 - Terraform documental, no aplicado en una cuenta AWS real.
 - **Verificado en vivo con `GEMINI_API_KEY` real:** el agente responde correctamente la pregunta ejemplo del PDF end-to-end (tool-use → filtro por zona crítica y tiempo detenido → respuesta en streaming SSE) — ver caso 7 de la Auditoría de IA para los dos problemas que solo aparecieron en esta verificación y cómo se corrigieron.
-- **No verificado en este entorno:** la app móvil no se corrió en un simulador/dispositivo real durante el desarrollo (entorno headless sin Expo Go); se verificó type-check limpio y bundle de Metro exitoso (642 módulos). Queda pendiente probarla en un iPhone/Android real.
+- **No verificado en este entorno:** la app móvil no se corrió en un simulador/dispositivo real durante el desarrollo (entorno headless sin Expo Go); se verificó type-check limpio y bundle de Metro exitoso (642 módulos, y 616 tras el rediseño de `driver-experience-visual-refresh` con las nuevas pantallas de tabs). Queda pendiente probarla en un iPhone/Android real, incluyendo confirmar que tracking/sync siguen funcionando desde la nueva pantalla de Rastreo.
 
 ## Video de sustentación
 
