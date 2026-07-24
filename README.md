@@ -7,22 +7,24 @@ MVP de un portal de monitoreo de flotas con ingesta de telemetría en tiempo rea
 ```
 Mobile (Expo, offline-first) ─┐
                                ├─► ingestion-service ─► Redpanda ─► consumer ─► TimescaleDB
-k6 (carga/caos) ───────────────┘         │                                        │
-                                          │ (circuit breaker)                     │
-                                          ▼                                       │
-Frontend (React) ─────────────────► api-gateway ◄── Gemini (tool-use) ────────────┘
-                    (circuit breaker)     │
-                                          └─► GET /v1/vehicles/state (circuit breaker)
+k6 (carga/caos) ───────────────┘         │        (grupo: ingestion-service)     │
+                                          │ (circuit breaker)                    │
+                                          ▼                                      │
+Frontend (React) ─────────────────► api-gateway ◄── Gemini (tool-use) ──────────-┘
+                    (circuit breaker)   │  │
+                                        │  └─► GET /v1/vehicles/state (circuit breaker)
+                                        └─────► Redpanda (grupo: api-gateway-live-events,
+                                                 consumer independiente, solo lectura en vivo)
 ```
 
 - **`backend/ingestion-service`** — ingress HTTP (`/v1/telemetry`, `/v1/telemetry/bulk`) → Redpanda (bus de eventos, API-compatible con Kafka) → consumer idempotente → TimescaleDB. Calcula `stopped_duration` y pertenencia a `CriticalZone` por vehículo.
-- **`backend/api-gateway`** — REST/SSE, agente de IA (Gemini, tool-use directo sobre `query_vehicle_state`), llama a `ingestion-service` y a Gemini detrás de Circuit Breakers independientes.
-- **`frontend`** — React + Vite: mapa (Leaflet), panel de alertas derivado del stream, chat con el agente, resumen de flota, roster de vehículos y guantera digital (ver nota de datos dummy más abajo).
+- **`backend/api-gateway`** — REST/SSE, agente de IA (Gemini, tool-use directo sobre `query_vehicle_state`), llama a `ingestion-service` y a Gemini detrás de Circuit Breakers independientes. Además consume Redpanda directamente (segundo consumer group, independiente del de `ingestion-service`) para exponer `GET /v1/vehicles/{vehicle_id}/events/stream` — telemetría cruda en vivo por vehículo, sin pasar por el estado agregado.
+- **`frontend`** — React + Vite: mapa (Leaflet), panel de alertas derivado del stream, chat con el agente, resumen de flota, roster de vehículos (seleccionable, con feed de telemetría en vivo) y guantera digital (ver nota de datos dummy más abajo).
 - **`mobile`** — Expo/React Native: captura de coordenadas offline-first (cola SQLite) con sincronización en bloque al reconectar, con pantallas de Inicio/Rastreo/Guantera/SOS por pestañas.
 - **`load-testing`** — script k6 de carga y caos (10% duplicados, 5% errores inyectados).
 - **`infra`** — Terraform de referencia para AWS (documentación, **no se aplica**).
 
-Cada bloque del enunciado (A-E) corresponde a un change de OpenSpec archivado: `telemetry-ingestion`, `fleet-ai-agent`, `web-portal-dashboard`, `driver-mobile-app`, `chaos-load-testing-iac`, `driver-experience-visual-refresh`.
+Cada bloque del enunciado (A-E) corresponde a un change de OpenSpec archivado: `telemetry-ingestion`, `fleet-ai-agent`, `web-portal-dashboard`, `driver-mobile-app`, `chaos-load-testing-iac`, `driver-experience-visual-refresh`, `vehicle-live-telemetry-feed`.
 
 ### Nota sobre datos de presentación (dummy)
 
@@ -69,7 +71,14 @@ curl http://localhost:8001/internal/vehicles/state
 # Preguntarle al agente (requiere GEMINI_API_KEY configurada)
 curl -N -X POST http://localhost:8002/v1/agent/chat -H "Content-Type: application/json" \
   -d '{"message":"¿Qué vehículos llevan detenidos más de 20 minutos en zonas críticas?"}'
+
+# Ver los envíos de telemetría cruda de un vehículo en vivo (lo mismo que
+# selecciona el portal al hacer click en una fila del roster) — sin esto,
+# la única forma de confirmarlo era consultar TimescaleDB a mano
+curl -N http://localhost:8002/v1/vehicles/veh-100/events/stream
 ```
+
+El feed de `GET /v1/vehicles/{vehicle_id}/events/stream` es **efímero**: reenvía eventos crudos desde que te conectas hacia adelante (consumer group propio sobre `telemetry.raw`, independiente del de `ingestion-service`), no persiste historial ni sobrevive un reinicio de `api-gateway`. Para ver el pasado, la vía sigue siendo `vehicle_telemetry`/`processed_events` en TimescaleDB.
 
 ### App móvil (Expo)
 
